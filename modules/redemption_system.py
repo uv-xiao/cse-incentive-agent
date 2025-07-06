@@ -20,107 +20,15 @@ class RedemptionSystem:
     def _get_default_rewards(self) -> List[Dict]:
         """获取默认奖励列表（基于red_black_list.jpg和网上资源）"""
         return [
-            # 小额奖励 (10-50分)
+            # 大额奖励 (300-2000分)
             {
-                "id": "rest_10min",
-                "name": "休息10分钟",
-                "description": "获得10分钟的自由休息时间",
-                "points": 10,
-                "category": "rest",
-                "emoji": "☕"
+                "id": "online_course",
+                "name": "在线课程",
+                "description": "购买一门在线学习课程",
+                "points": 300,
+                "category": "study",
+                "emoji": "💻"
             },
-            {
-                "id": "water_reminder",
-                "name": "补充水分",
-                "description": "喝一瓶水，保持水分充足",
-                "points": 10,
-                "category": "health",
-                "emoji": "💧"
-            },
-            {
-                "id": "snack_healthy",
-                "name": "健康小零食",
-                "description": "享用一份健康的小零食",
-                "points": 20,
-                "category": "food",
-                "emoji": "🥜"
-            },
-            {
-                "id": "stretch_5min",
-                "name": "拉伸运动",
-                "description": "5分钟拉伸运动，缓解疲劳",
-                "points": 20,
-                "category": "health",
-                "emoji": "🧘"
-            },
-            {
-                "id": "music_break",
-                "name": "音乐放松",
-                "description": "听2-3首喜欢的歌曲",
-                "points": 30,
-                "category": "entertainment",
-                "emoji": "🎵"
-            },
-            {
-                "id": "chat_friend",
-                "name": "朋友聊天",
-                "description": "和朋友聊天5分钟",
-                "points": 40,
-                "category": "social",
-                "emoji": "💬"
-            },
-            
-            # 中等奖励 (60-200分)
-            {
-                "id": "meal_favorite",
-                "name": "最爱的一餐",
-                "description": "吃一顿自己喜欢的美食",
-                "points": 60,
-                "category": "food",
-                "emoji": "🍜"
-            },
-            {
-                "id": "episode_show",
-                "name": "看一集剧",
-                "description": "看一集喜欢的电视剧或动漫",
-                "points": 80,
-                "category": "entertainment",
-                "emoji": "📺"
-            },
-            {
-                "id": "game_30min",
-                "name": "游戏时间",
-                "description": "玩30分钟喜欢的游戏",
-                "points": 100,
-                "category": "entertainment",
-                "emoji": "🎮"
-            },
-            {
-                "id": "walk_outside",
-                "name": "户外散步",
-                "description": "到户外散步30分钟",
-                "points": 100,
-                "category": "health",
-                "emoji": "🚶"
-            },
-            {
-                "id": "coffee_shop",
-                "name": "咖啡店学习",
-                "description": "去咖啡店学习一次",
-                "points": 150,
-                "category": "experience",
-                "emoji": "☕"
-            },
-            {
-                "id": "movie_ticket",
-                "name": "电影票一张",
-                "description": "看一场电影",
-                "points": 200,
-                "category": "entertainment",
-                "emoji": "🎬"
-            },
-            
-            # 大额奖励 (400-2000分)
             {
                 "id": "dinner_friends",
                 "name": "朋友聚餐",
@@ -160,32 +68,6 @@ class RedemptionSystem:
                 "points": 2000,
                 "category": "tech",
                 "emoji": "📱"
-            },
-            
-            # 特殊奖励（配合考公主题）
-            {
-                "id": "study_materials",
-                "name": "学习资料",
-                "description": "购买新的学习资料或参考书",
-                "points": 150,
-                "category": "study",
-                "emoji": "📚"
-            },
-            {
-                "id": "online_course",
-                "name": "在线课程",
-                "description": "购买一门在线学习课程",
-                "points": 300,
-                "category": "study",
-                "emoji": "💻"
-            },
-            {
-                "id": "mock_exam",
-                "name": "模拟考试",
-                "description": "参加一次专业的模拟考试",
-                "points": 200,
-                "category": "study",
-                "emoji": "📝"
             }
         ]
     

@@ -17,15 +17,19 @@ class ScoringSystem:
             "study_duration": {
                 "30": {"name": "学习30分钟", "points": 2},
                 "60": {"name": "学习60分钟", "points": 4},
-                "90": {"name": "学习90分钟", "points": 6},
-                "120": {"name": "学习120分钟", "points": 8},
-                "180": {"name": "学习180分钟", "points": 10}
+                "120": {"name": "学习120分钟", "points": 6},
+                "180": {"name": "学习180分钟", "points": 8},
+                "240": {"name": "学习240分钟", "points": 10},
+                "360": {"name": "学习360分钟", "points": 12},
+                "480": {"name": "学习480分钟", "points": 15}
             },
             "problems_solved": {
                 "10": {"name": "完成10道题", "points": 2},
-                "20": {"name": "完成20道题", "points": 4},
-                "30": {"name": "完成30道题", "points": 6},
-                "50": {"name": "完成50道题", "points": 10}
+                "30": {"name": "完成30道题", "points": 4},
+                "50": {"name": "完成50道题", "points": 6},
+                "80": {"name": "完成80道题", "points": 8},
+                "120": {"name": "完成120道题", "points": 10},
+                "180": {"name": "完成180道题", "points": 12}
             },
             "sleep_quality": {
                 "good": {"name": "睡眠充足(7-8小时)", "points": 1},
@@ -56,12 +60,36 @@ class ScoringSystem:
                 "points": 50
             },
             "penalties": {
-                "no_study": {"name": "未学习", "points": -2},
-                "no_checkin": {"name": "未签到", "points": -1},
-                "unhealthy_diet": {"name": "不健康饮食", "points": -1},
-                "poor_sleep": {"name": "睡眠不足6小时", "points": -2},
-                "no_breaks": {"name": "连续学习未休息", "points": -2},
-                "anxiety": {"name": "焦虑情绪", "points": -1}
+                "no_study": {"name": "未学习", "points": -6},
+                "no_checkin": {"name": "未签到", "points": -3},
+                "unhealthy_diet": {"name": "不健康饮食", "points": -3},
+                "poor_sleep": {"name": "睡眠不足6小时", "points": -5},
+                "no_breaks": {"name": "连续学习未休息", "points": -5},
+                "anxiety": {"name": "焦虑情绪", "points": -3},
+                "no_thesis": {"name": "未进行论文写作", "points": -4},
+                "no_memorization": {"name": "未进行背诵", "points": -3},
+                "no_online_course": {"name": "未学习网课", "points": -3}
+            },
+            "thesis_writing": {
+                "500": {"name": "论文写作500字", "points": 2},
+                "1000": {"name": "论文写作1000字", "points": 4},
+                "2000": {"name": "论文写作2000字", "points": 6},
+                "3000": {"name": "论文写作3000字", "points": 8},
+                "5000": {"name": "论文写作5000字", "points": 10}
+            },
+            "memorization": {
+                "15": {"name": "背诵15分钟", "points": 1},
+                "30": {"name": "背诵30分钟", "points": 2},
+                "60": {"name": "背诵60分钟", "points": 4},
+                "90": {"name": "背诵90分钟", "points": 5},
+                "120": {"name": "背诵120分钟", "points": 6}
+            },
+            "online_course": {
+                "30": {"name": "网课学习30分钟", "points": 2},
+                "60": {"name": "网课学习60分钟", "points": 3},
+                "90": {"name": "网课学习90分钟", "points": 4},
+                "120": {"name": "网课学习120分钟", "points": 5},
+                "180": {"name": "网课学习180分钟", "points": 6}
             },
             "special_rewards": {
                 "breakthrough": {"name": "攻克难题", "points": 5},
@@ -210,6 +238,75 @@ class ScoringSystem:
                 "points": penalty
             })
         
+        # 论文写作积分
+        thesis_words = responses.get("thesis_writing", {}).get("value", 0)
+        if thesis_words > 0:
+            for threshold, rule in sorted(self.scoring_rules["thesis_writing"].items(), key=lambda x: int(x[0])):
+                if thesis_words >= int(threshold):
+                    earned_points = rule["points"]
+            if thesis_words >= 500:
+                point_details.append({
+                    "category": "论文写作",
+                    "item": f"论文写作{thesis_words}字",
+                    "points": earned_points
+                })
+                points += earned_points
+        else:
+            # 未进行论文写作惩罚
+            penalty = self.scoring_rules["penalties"]["no_thesis"]["points"]
+            points += penalty
+            point_details.append({
+                "category": "惩罚",
+                "item": self.scoring_rules["penalties"]["no_thesis"]["name"],
+                "points": penalty
+            })
+        
+        # 背诵积分
+        memorization_time = responses.get("memorization_time", {}).get("value", 0)
+        if memorization_time > 0:
+            for threshold, rule in sorted(self.scoring_rules["memorization"].items(), key=lambda x: int(x[0])):
+                if memorization_time >= int(threshold):
+                    earned_points = rule["points"]
+            if memorization_time >= 15:
+                point_details.append({
+                    "category": "背诵",
+                    "item": f"背诵{memorization_time}分钟",
+                    "points": earned_points
+                })
+                points += earned_points
+        else:
+            # 未进行背诵惩罚
+            penalty = self.scoring_rules["penalties"]["no_memorization"]["points"]
+            points += penalty
+            point_details.append({
+                "category": "惩罚",
+                "item": self.scoring_rules["penalties"]["no_memorization"]["name"],
+                "points": penalty
+            })
+        
+        # 网课学习积分
+        online_course_time = responses.get("online_course_time", {}).get("value", 0)
+        if online_course_time > 0:
+            for threshold, rule in sorted(self.scoring_rules["online_course"].items(), key=lambda x: int(x[0])):
+                if online_course_time >= int(threshold):
+                    earned_points = rule["points"]
+            if online_course_time >= 30:
+                point_details.append({
+                    "category": "网课学习",
+                    "item": f"网课学习{online_course_time}分钟",
+                    "points": earned_points
+                })
+                points += earned_points
+        else:
+            # 未学习网课惩罚
+            penalty = self.scoring_rules["penalties"]["no_online_course"]["points"]
+            points += penalty
+            point_details.append({
+                "category": "惩罚",
+                "item": self.scoring_rules["penalties"]["no_online_course"]["name"],
+                "points": penalty
+            })
+        
         # 计算连续学习奖励
         if historical_data:
             streak_bonus = self._calculate_streak_bonus(responses, historical_data)
@@ -273,10 +370,12 @@ class ScoringSystem:
             return "💪 很不错！今天的学习很充实，明天继续加油！"
         elif daily_points >= 5:
             return "😊 今天有进步！坚持就是胜利，明天争取更好！"
-        elif daily_points >= 0:
-            return "🤗 没关系，学习是个长期过程。调整状态，明天重新出发！"
+        elif daily_points >= -5:
+            return "🤗 今天有些不足，但没关系。找出问题，明天改进！"
+        elif daily_points >= -10:
+            return "💝 虽然今天扣分较多，但每一天都是新的开始，加油！"
         else:
-            return "💝 暂时的低谷不要紧，相信自己，明天会更好的！"
+            return "⚠️ 今天的惩罚分数较高，需要认真反思并制定改进计划。记住，坚持最重要！"
     
     def get_level_info(self, total_points: int) -> Dict:
         levels = [

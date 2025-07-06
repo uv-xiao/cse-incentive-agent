@@ -2,9 +2,29 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Quick Reference
+
+**Main Entry Point**: `main.py`  
+**User Data Location**: `data/` directory  
+**Reports Location**: `reports/` directory  
+**Key Modules**:
+- `modules/questionnaire.py` - Daily questions
+- `modules/scoring.py` - Points calculation
+- `modules/report_generator.py` - AI reports
+- `modules/data_manager.py` - Data persistence
+- `modules/redemption_system.py` - Rewards system
+
 ## Project Overview
 
 This is a Civil Service Exam Study Agent (考公Agent) designed to support ZZW in their civil service exam preparation journey. The system provides daily questionnaires, generates encouraging summary reports, and maintains a points-based reward/punishment system to gamify the study process.
+
+### Key Features
+- 📋 Daily questionnaire system with comprehensive tracking
+- 🎯 Points-based gamification with rewards and penalties
+- 📊 AI-powered report generation using gemini-cli
+- 📈 Progress visualization and statistics
+- 🎁 Reward redemption system
+- 📤 Excel export/import for non-technical users
 
 ## Development Commands
 
@@ -137,3 +157,124 @@ diary/
 ├── CLAUDE.md              # This file
 └── USAGE.md               # User guide (to be created)
 ```
+
+## Incremental Updates
+
+- Tell Claude to make changes about scoring rule and any other things, the Claude Code should synchronize the code changes and the USAGE.md should be updated.
+- Always test changes before confirming completion
+- Document all changes in both CLAUDE.md and USAGE.md
+- Preserve user data when updating system rules
+
+## Recent Updates (2025-07-06)
+
+### Expanded Questionnaire Options
+- Study time options now extend up to 480+ minutes (8+ hours)
+- Practice problem options now extend up to 180+ problems
+- Added thesis writing tracking (0-5000+ words daily)
+- Added memorization time tracking (0-120+ minutes)
+- Added online course viewing time tracking (0-180+ minutes)
+
+### Enhanced Scoring System
+- Extended study duration scoring: up to 15 points for 480+ minutes
+- Extended practice problem scoring: up to 12 points for 180+ problems
+- Added thesis writing scoring: 2-10 points based on word count
+- Added memorization scoring: 1-6 points based on time spent
+- Added online course scoring: 2-6 points based on viewing time
+
+### Strengthened Penalty System (2025-07-06)
+- Increased all penalties by 2-3x for stronger deterrent effect
+- Added new penalties for not doing thesis/memorization/online courses
+- Maximum daily penalty can now reach -30 points to encourage balanced study
+
+These updates reflect ZZW's actual study patterns and provide better tracking for comprehensive exam preparation activities.
+
+## Common User Requests and How to Handle Them
+
+### 1. Adjusting Scoring Rules
+```
+User: "I want to increase points for studying 300 minutes"
+Action: Edit modules/scoring.py, update the study_duration rules, then update USAGE.md
+```
+
+### 2. Adding New Questions
+```
+User: "Add a question about exercise time"
+Action: Edit modules/questionnaire.py to add the question, then update scoring.py if needed
+```
+
+### 3. Modifying Rewards
+```
+User: "Add a new reward: bubble tea for 50 points"
+Action: Edit modules/redemption_system.py, add to the rewards list
+```
+
+### 4. Fixing Data Issues
+```
+User: "My points seem wrong today"
+Action: Check data/points.json and data/responses.json, recalculate if needed
+```
+
+### 5. Generating Special Reports
+```
+User: "Generate a monthly summary report"
+Action: Use data_manager to gather data, then generate report with gemini-cli
+```
+
+## Code Style Guidelines
+
+1. **Language**: All code comments and user-facing text should be in Chinese
+2. **Emojis**: Use emojis liberally in user interfaces for visual appeal
+3. **Error Handling**: Always provide friendly Chinese error messages
+4. **Data Validation**: Validate all user inputs before processing
+5. **File Organization**: Keep related functions in their respective modules
+
+## Testing Approach
+
+When making changes:
+1. Test with edge cases (0 study time, maximum values)
+2. Verify point calculations are correct
+3. Check that reports generate properly
+4. Ensure Excel import/export works correctly
+5. Test that historical data is preserved
+
+## Important Notes for Future Development
+
+### User Context
+- ZZW is preparing for civil service exams (考公)
+- Also working on thesis writing simultaneously
+- Studies for extended periods (often 6-8+ hours daily)
+- Completes large numbers of practice problems (100+ daily)
+- Values detailed tracking and encouragement
+
+### System Design Principles
+1. **Positive Reinforcement**: Focus on encouragement over criticism
+2. **Flexibility**: Support various study patterns and schedules
+3. **Data Integrity**: Never lose user data, always backup before modifications
+4. **User-Friendly**: Design for non-technical users (Excel support)
+5. **Comprehensive Tracking**: Track all aspects of exam preparation
+
+### Common Pitfalls to Avoid
+1. Don't hardcode date formats - use datetime properly
+2. Don't assume gemini-cli is always available - have fallbacks
+3. Don't overwrite historical data when updating rules
+4. Don't forget to update USAGE.md when changing features
+5. Don't remove features without user confirmation
+
+## Debugging Tips
+
+1. **Points calculation issues**: Check calculate_points() in scoring.py
+2. **Excel import failures**: Verify column names match expected format
+3. **Report generation errors**: Check if gemini-cli is installed and accessible
+4. **Missing data**: Look in data/ directory for JSON files
+5. **UI issues**: Check main.py menu logic
+
+## Future Enhancement Ideas
+
+1. **Mobile App Integration**: API for mobile questionnaire submission
+2. **Study Group Features**: Compare progress with study partners
+3. **Smart Reminders**: AI-powered study time suggestions
+4. **Exam Countdown**: Special features as exam date approaches
+5. **Practice Test Integration**: Track mock exam scores
+6. **Study Material Management**: Organize and track study resources
+7. **Voice Input**: Support voice answers for questionnaires
+8. **Weekly/Monthly Challenges**: Special goals for bonus points
