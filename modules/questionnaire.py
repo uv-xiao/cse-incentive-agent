@@ -201,6 +201,12 @@ class DailyQuestionnaire:
                 "values": [0, 15, 45, 75, 105, 150, 210]
             },
             {
+                "id": "accuracy_rate",
+                "question": "今天做题的正确率是多少？（请输入0-100的数字）",
+                "type": "text",
+                "placeholder": "例如：85 表示85%的正确率"
+            },
+            {
                 "id": "special_achievement",
                 "question": "今天有什么特别的学习成就吗？",
                 "type": "text",

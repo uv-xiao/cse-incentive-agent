@@ -1,5 +1,6 @@
 from typing import Dict, List, Tuple
 from datetime import datetime, timedelta
+import re
 
 
 class ScoringSystem:
@@ -90,6 +91,19 @@ class ScoringSystem:
                 "90": {"name": "网课学习90分钟", "points": 4},
                 "120": {"name": "网课学习120分钟", "points": 5},
                 "180": {"name": "网课学习180分钟", "points": 6}
+            },
+            "accuracy_rate": {
+                "95": {"name": "正确率95%以上", "points": 8},
+                "90": {"name": "正确率90-94%", "points": 6},
+                "85": {"name": "正确率85-89%", "points": 5},
+                "80": {"name": "正确率80-84%", "points": 4},
+                "75": {"name": "正确率75-79%", "points": 3},
+                "70": {"name": "正确率70-74%", "points": 2},
+                "60": {"name": "正确率60-69%", "points": 1},
+                "50": {"name": "正确率50-59%", "points": 0},
+                "40": {"name": "正确率40-49%", "points": -2},
+                "30": {"name": "正确率30-39%", "points": -3},
+                "0": {"name": "正确率低于30%", "points": -5}
             },
             "special_rewards": {
                 "breakthrough": {"name": "攻克难题", "points": 5},
@@ -306,6 +320,65 @@ class ScoringSystem:
                 "item": self.scoring_rules["penalties"]["no_online_course"]["name"],
                 "points": penalty
             })
+        
+        # 做题正确率积分/惩罚
+        accuracy_rate_str = responses.get("accuracy_rate", "")
+        if accuracy_rate_str:
+            try:
+                # 提取数字，支持多种格式：85, 85%, 85.5
+                accuracy_match = re.search(r'(\d+\.?\d*)', str(accuracy_rate_str))
+                if accuracy_match:
+                    accuracy_rate = float(accuracy_match.group(1))
+                    
+                    # 只有在做了题的情况下才计算正确率积分
+                    problems_count = responses.get("problems_completed", {}).get("value", 0)
+                    if problems_count > 0 and 0 <= accuracy_rate <= 100:
+                        # 根据正确率范围确定积分
+                        accuracy_points = 0
+                        accuracy_desc = ""
+                        
+                        if accuracy_rate >= 95:
+                            accuracy_points = self.scoring_rules["accuracy_rate"]["95"]["points"]
+                            accuracy_desc = self.scoring_rules["accuracy_rate"]["95"]["name"]
+                        elif accuracy_rate >= 90:
+                            accuracy_points = self.scoring_rules["accuracy_rate"]["90"]["points"]
+                            accuracy_desc = self.scoring_rules["accuracy_rate"]["90"]["name"]
+                        elif accuracy_rate >= 85:
+                            accuracy_points = self.scoring_rules["accuracy_rate"]["85"]["points"]
+                            accuracy_desc = self.scoring_rules["accuracy_rate"]["85"]["name"]
+                        elif accuracy_rate >= 80:
+                            accuracy_points = self.scoring_rules["accuracy_rate"]["80"]["points"]
+                            accuracy_desc = self.scoring_rules["accuracy_rate"]["80"]["name"]
+                        elif accuracy_rate >= 75:
+                            accuracy_points = self.scoring_rules["accuracy_rate"]["75"]["points"]
+                            accuracy_desc = self.scoring_rules["accuracy_rate"]["75"]["name"]
+                        elif accuracy_rate >= 70:
+                            accuracy_points = self.scoring_rules["accuracy_rate"]["70"]["points"]
+                            accuracy_desc = self.scoring_rules["accuracy_rate"]["70"]["name"]
+                        elif accuracy_rate >= 60:
+                            accuracy_points = self.scoring_rules["accuracy_rate"]["60"]["points"]
+                            accuracy_desc = self.scoring_rules["accuracy_rate"]["60"]["name"]
+                        elif accuracy_rate >= 50:
+                            accuracy_points = self.scoring_rules["accuracy_rate"]["50"]["points"]
+                            accuracy_desc = self.scoring_rules["accuracy_rate"]["50"]["name"]
+                        elif accuracy_rate >= 40:
+                            accuracy_points = self.scoring_rules["accuracy_rate"]["40"]["points"]
+                            accuracy_desc = self.scoring_rules["accuracy_rate"]["40"]["name"]
+                        elif accuracy_rate >= 30:
+                            accuracy_points = self.scoring_rules["accuracy_rate"]["30"]["points"]
+                            accuracy_desc = self.scoring_rules["accuracy_rate"]["30"]["name"]
+                        else:
+                            accuracy_points = self.scoring_rules["accuracy_rate"]["0"]["points"]
+                            accuracy_desc = self.scoring_rules["accuracy_rate"]["0"]["name"]
+                        
+                        points += accuracy_points
+                        point_details.append({
+                            "category": "做题正确率" if accuracy_points >= 0 else "惩罚",
+                            "item": f"{accuracy_desc} (实际: {accuracy_rate:.1f}%)",
+                            "points": accuracy_points
+                        })
+            except:
+                pass  # 如果解析失败，忽略正确率积分
         
         # 计算连续学习奖励
         if historical_data:

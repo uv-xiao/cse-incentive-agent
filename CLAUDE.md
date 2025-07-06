@@ -165,7 +165,33 @@ diary/
 - Document all changes in both CLAUDE.md and USAGE.md
 - Preserve user data when updating system rules
 
-## Recent Updates (2025-07-06)
+## Recent Updates (2025-01-06)
+
+### Intelligent Answer Processing
+- Added natural language answer support using gemini-cli
+- System can now understand answers like "0 (don't deduct points!)" or "studied for 2 hours"
+- Automatic semantic matching for better user experience
+- Fallback mechanism ensures all answers are processed
+- Real-time feedback on answer interpretation
+
+### Practice Accuracy Tracking
+- Added accuracy rate text input question (0-100)
+- Scoring based on accuracy ranges:
+  - 95%+: +8 points (excellent)
+  - 90-94%: +6 points (very good)
+  - 85-89%: +5 points (good)
+  - 80-84%: +4 points (decent)
+  - 75-79%: +3 points (passing)
+  - 70-74%: +2 points (needs work)
+  - 60-69%: +1 point (warning)
+  - 50-59%: 0 points (poor)
+  - 40-49%: -2 points (very poor)
+  - 30-39%: -3 points (failing)
+  - <30%: -5 points (critical)
+- Only calculates accuracy points when problems were actually completed
+- Supports various input formats: 85, 85%, 85.5
+
+## Previous Updates (2025-07-06)
 
 ### Expanded Questionnaire Options
 - Study time options now extend up to 480+ minutes (8+ hours)

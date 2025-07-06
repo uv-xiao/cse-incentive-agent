@@ -2,12 +2,14 @@ import pandas as pd
 import os
 from datetime import datetime
 from typing import Dict, List
+from .intelligent_answer_processor import IntelligentAnswerProcessor
 
 
 class ExcelHandler:
     def __init__(self):
         self.questionnaire_dir = "questionnaires"
         os.makedirs(self.questionnaire_dir, exist_ok=True)
+        self.intelligent_processor = IntelligentAnswerProcessor()
     
     def export_questionnaire(self, questions: List[Dict]) -> str:
         """导出问卷到Excel文件"""
@@ -139,20 +141,28 @@ class ExcelHandler:
             
             # 处理不同类型的答案
             if question['type'] == 'choice':
-                # 选择题答案应该是数字
-                try:
-                    answer_int = int(answer)
-                    if 0 <= answer_int < len(question['options']):
-                        responses[question['id']] = answer_int
-                except (ValueError, TypeError):
-                    print(f"警告：问题'{question['question']}'的答案'{answer}'不是有效的选项编号")
+                # 保存原始答案，后续使用智能处理
+                responses[question['id']] = answer
             
             elif question['type'] == 'text':
                 # 文本答案
                 if pd.notna(answer) and str(answer).strip():
                     responses[question['id']] = str(answer).strip()
         
-        return responses
+        # 使用智能处理器处理所有答案
+        processed_responses, warnings = self.intelligent_processor.batch_process_answers(
+            responses, questions
+        )
+        
+        # 打印警告信息
+        if warnings:
+            print("\n📋 智能答案识别结果:")
+            print("-" * 50)
+            for warning in warnings:
+                print(f"  • {warning}")
+            print("-" * 50)
+        
+        return processed_responses
     
     def validate_excel_file(self, filepath: str) -> bool:
         """验证Excel文件格式是否正确"""
