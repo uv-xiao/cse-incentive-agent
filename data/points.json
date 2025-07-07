@@ -1,0 +1,116 @@
+{
+  "total_points": 76,
+  "history": [
+    {
+      "date": "2025-07-06",
+      "daily_points": 32,
+      "total_points": 32,
+      "details": [
+        {
+          "category": "签到",
+          "item": "每日签到",
+          "points": 2
+        },
+        {
+          "category": "学习时长",
+          "item": "学习540分钟",
+          "points": 15
+        },
+        {
+          "category": "练习题",
+          "item": "完成20道题",
+          "points": 2
+        },
+        {
+          "category": "生活习惯",
+          "item": "睡眠充足(7-8小时)",
+          "points": 1
+        },
+        {
+          "category": "生活习惯",
+          "item": "健康饮食",
+          "points": 1
+        },
+        {
+          "category": "复习",
+          "item": "完成复习任务",
+          "points": 2
+        },
+        {
+          "category": "论文写作",
+          "item": "论文写作4000字",
+          "points": 8
+        },
+        {
+          "category": "背诵",
+          "item": "背诵75分钟",
+          "points": 4
+        },
+        {
+          "category": "惩罚",
+          "item": "未学习网课",
+          "points": -3
+        }
+      ],
+      "timestamp": "2025-07-06T23:57:20.522609"
+    },
+    {
+      "date": "2025-07-07",
+      "daily_points": 44,
+      "total_points": 76,
+      "details": [
+        {
+          "category": "签到",
+          "item": "每日签到",
+          "points": 2
+        },
+        {
+          "category": "学习时长",
+          "item": "学习540分钟",
+          "points": 15
+        },
+        {
+          "category": "练习题",
+          "item": "完成40道题",
+          "points": 4
+        },
+        {
+          "category": "生活习惯",
+          "item": "营养均衡",
+          "points": 2
+        },
+        {
+          "category": "复习",
+          "item": "完成复习任务",
+          "points": 2
+        },
+        {
+          "category": "休息",
+          "item": "劳逸结合",
+          "points": 2
+        },
+        {
+          "category": "论文写作",
+          "item": "论文写作4000字",
+          "points": 8
+        },
+        {
+          "category": "背诵",
+          "item": "背诵75分钟",
+          "points": 4
+        },
+        {
+          "category": "惩罚",
+          "item": "未学习网课",
+          "points": -3
+        },
+        {
+          "category": "做题正确率",
+          "item": "正确率95%以上 (实际: 96.0%)",
+          "points": 8
+        }
+      ],
+      "timestamp": "2025-07-08T02:21:31.745105"
+    }
+  ]
+}

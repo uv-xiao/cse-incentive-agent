@@ -1,0 +1,50 @@
+[
+  {
+    "id": "online_course",
+    "name": "在线课程",
+    "description": "购买一门在线学习课程",
+    "points": 300,
+    "category": "study",
+    "emoji": "💻"
+  },
+  {
+    "id": "dinner_friends",
+    "name": "朋友聚餐",
+    "description": "和朋友一起吃大餐",
+    "points": 400,
+    "category": "social",
+    "emoji": "🍽️"
+  },
+  {
+    "id": "spa_massage",
+    "name": "按摩放松",
+    "description": "享受一次专业按摩",
+    "points": 600,
+    "category": "health",
+    "emoji": "💆"
+  },
+  {
+    "id": "shopping_treat",
+    "name": "购物奖励",
+    "description": "买一件想要的东西（限额200元）",
+    "points": 800,
+    "category": "shopping",
+    "emoji": "🛍️"
+  },
+  {
+    "id": "weekend_trip",
+    "name": "周末短途游",
+    "description": "周末去附近城市游玩",
+    "points": 1000,
+    "category": "travel",
+    "emoji": "🏖️"
+  },
+  {
+    "id": "new_phone",
+    "name": "换新手机",
+    "description": "购买新手机（如red_black_list所示）",
+    "points": 2000,
+    "category": "tech",
+    "emoji": "📱"
+  }
+]

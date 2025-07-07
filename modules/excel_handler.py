@@ -1,5 +1,6 @@
 import pandas as pd
 import os
+import json
 from datetime import datetime
 from typing import Dict, List
 from .intelligent_answer_processor import IntelligentAnswerProcessor
@@ -119,12 +120,19 @@ class ExcelHandler:
         # 读取Excel文件
         df = pd.read_excel(filepath, sheet_name='每日问卷')
         
+        # 提取问卷的原始日期（从文件名或Excel内容中）
+        questionnaire_date = self._extract_questionnaire_date(filepath, df)
+        print(f"📅 问卷原始日期: {questionnaire_date}")
+        
         # 提取答案
         responses = {}
         
         for i, row in df.iterrows():
             # 跳过自动填充的问题
             if row['答案类型'] == '自动填充':
+                # 对于日期问题，使用问卷的原始日期而不是当前日期
+                if row['问题'] == '今天的日期':
+                    responses['date'] = questionnaire_date
                 continue
             
             # 找到对应的问题
@@ -149,6 +157,10 @@ class ExcelHandler:
                 if pd.notna(answer) and str(answer).strip():
                     responses[question['id']] = str(answer).strip()
         
+        # 确保日期字段被正确设置
+        if 'date' not in responses:
+            responses['date'] = questionnaire_date
+        
         # 使用智能处理器处理所有答案
         processed_responses, warnings = self.intelligent_processor.batch_process_answers(
             responses, questions
@@ -161,6 +173,38 @@ class ExcelHandler:
             for warning in warnings:
                 print(f"  • {warning}")
             print("-" * 50)
+        
+        # 检查是否有用户反馈
+        user_feedback = self.intelligent_processor.get_user_feedback()
+        if user_feedback:
+            print("\n💡 用户反馈（问题修改建议）:")
+            print("-" * 50)
+            for feedback in user_feedback:
+                print(f"  📝 {feedback['question']}")
+                print(f"     {feedback['feedback']}")
+            print("-" * 50)
+            
+            # 保存反馈到文件
+            feedback_file = os.path.join(self.questionnaire_dir, "user_feedback.json")
+            existing_feedback = []
+            if os.path.exists(feedback_file):
+                with open(feedback_file, 'r', encoding='utf-8') as f:
+                    existing_feedback = json.load(f)
+            
+            # 添加时间戳
+            for fb in user_feedback:
+                fb['timestamp'] = datetime.now().isoformat()
+            
+            existing_feedback.extend(user_feedback)
+            
+            with open(feedback_file, 'w', encoding='utf-8') as f:
+                json.dump(existing_feedback, f, ensure_ascii=False, indent=2)
+            
+            print("\n是否要根据这些反馈修改问卷问题？")
+            print("（反馈已保存到 questionnaires/user_feedback.json）")
+            
+            # 清空反馈
+            self.intelligent_processor.clear_feedback()
         
         return processed_responses
     
@@ -210,3 +254,34 @@ class ExcelHandler:
                 if f.startswith('daily_questionnaire_') and f.endswith('.xlsx')]
         
         return [os.path.join(answered_dir, f) for f in sorted(files, reverse=True)]
+    
+    def _extract_questionnaire_date(self, filepath: str, df: pd.DataFrame) -> str:
+        """提取问卷的原始日期"""
+        # 方法1：从文件名提取日期
+        filename = os.path.basename(filepath)
+        # 文件名格式：daily_questionnaire_YYYY-MM-DD.xlsx
+        import re
+        date_match = re.search(r'daily_questionnaire_(\d{4}-\d{2}-\d{2})\.xlsx', filename)
+        if date_match:
+            return date_match.group(1)
+        
+        # 方法2：从Excel内容中的日期字段提取
+        for i, row in df.iterrows():
+            if row['问题'] == '今天的日期' and row['答案类型'] == '自动填充':
+                date_value = row['答案']
+                if pd.notna(date_value):
+                    # 处理可能的日期格式
+                    date_str = str(date_value)
+                    # 如果是标准格式 YYYY-MM-DD，直接返回
+                    if re.match(r'\d{4}-\d{2}-\d{2}', date_str):
+                        return date_str
+                    # 如果是其他日期格式，尝试解析
+                    try:
+                        from datetime import datetime
+                        parsed_date = pd.to_datetime(date_str)
+                        return parsed_date.strftime("%Y-%m-%d")
+                    except:
+                        pass
+        
+        # 方法3：如果都失败了，使用当前日期（回退方案）
+        return datetime.now().strftime("%Y-%m-%d")

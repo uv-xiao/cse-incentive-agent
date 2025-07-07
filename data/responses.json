@@ -1,0 +1,119 @@
+[
+  {
+    "date": "2025-07-06",
+    "study_completed": {
+      "display": "✅ 完成",
+      "value": "completed"
+    },
+    "study_duration": {
+      "display": "👑 480分钟以上",
+      "value": 540
+    },
+    "problems_completed": {
+      "display": "📝 11-30题",
+      "value": 20
+    },
+    "focus_level": {
+      "display": "😊 7-8分（良好）",
+      "value": 7.5
+    },
+    "emotional_state": {
+      "display": "😊 积极乐观",
+      "value": "positive"
+    },
+    "physical_condition": {
+      "display": "💪 精力充沛",
+      "value": "energetic"
+    },
+    "sleep_quality": {
+      "display": "😊 良好（7-8小时）",
+      "value": "good"
+    },
+    "diet_quality": {
+      "display": "🥗 健康均衡",
+      "value": "healthy"
+    },
+    "breaks_taken": {
+      "display": "⏱️ 偶尔休息",
+      "value": "occasional"
+    },
+    "review_completed": {
+      "display": "✅ 完成复习计划",
+      "value": "completed"
+    },
+    "notes_taken": {
+      "display": "📝 简单记录",
+      "value": "simple"
+    },
+    "thesis_writing": {
+      "display": "💪 3001-5000字",
+      "value": 4000
+    },
+    "memorization_time": {
+      "display": "🔥 60-90分钟",
+      "value": 75
+    },
+    "special_achievement": "开始背诵申论素材",
+    "tomorrow_plan": "复习背诵的申论素材、背一页成语、继续做数量题、论文再写5000字",
+    "timestamp": "2025-07-06T23:57:20.521938"
+  },
+  {
+    "date": "2025-07-07",
+    "study_completed": {
+      "display": "✅ 完成",
+      "value": "completed"
+    },
+    "study_duration": {
+      "display": "👑 480分钟以上",
+      "value": 540
+    },
+    "problems_completed": {
+      "display": "📝 31-50题",
+      "value": 40
+    },
+    "focus_level": {
+      "display": "😊 7-8分（良好）",
+      "value": 7.5
+    },
+    "emotional_state": {
+      "display": "😐 平静正常",
+      "value": "normal"
+    },
+    "physical_condition": {
+      "display": "💪 精力充沛",
+      "value": "energetic"
+    },
+    "sleep_quality": {
+      "display": "😐 一般（6-7小时）",
+      "value": "fair"
+    },
+    "diet_quality": {
+      "display": "🥑 非常注意营养",
+      "value": "excellent"
+    },
+    "breaks_taken": {
+      "display": "🧘 劳逸结合很好",
+      "value": "excellent"
+    },
+    "review_completed": {
+      "display": "✅ 完成复习计划",
+      "value": "completed"
+    },
+    "thesis_writing": {
+      "display": "💪 3001-5000字",
+      "value": 4000
+    },
+    "memorization_time": {
+      "display": "🔥 60-90分钟",
+      "value": 75
+    },
+    "online_course_time": {
+      "display": "❌ 没有看网课",
+      "value": 0
+    },
+    "accuracy_rate": "96",
+    "special_achievement": "论文写完了一个部分！开始新的章节 做题题量上来了，但是速度有点慢",
+    "tomorrow_plan": "和今天差不多～复习成语，背一下申论材料，做数量题，继续写论文！",
+    "timestamp": "2025-07-08T02:21:31.738585"
+  }
+]

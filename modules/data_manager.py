@@ -298,3 +298,86 @@ class DataManager:
             'total_problems': total_problems,
             'study_days': len([r for r in responses if r.get('study_duration', {}).get('value', 0) > 0])
         }
+    
+    def rollback_day(self, date: str) -> Dict:
+        """
+        回档指定日期的数据（删除问卷响应和积分记录）
+        返回操作结果
+        """
+        result = {
+            'success': False,
+            'message': '',
+            'deleted_response': None,
+            'deleted_points': None,
+            'points_adjusted': 0
+        }
+        
+        # 1. 删除问卷响应
+        responses = self._load_responses()
+        original_count = len(responses)
+        responses_to_keep = []
+        deleted_response = None
+        
+        for response in responses:
+            if response.get('date') == date:
+                deleted_response = response
+            else:
+                responses_to_keep.append(response)
+        
+        if deleted_response:
+            with open(self.responses_file, 'w', encoding='utf-8') as f:
+                json.dump(responses_to_keep, f, ensure_ascii=False, indent=2)
+            result['deleted_response'] = deleted_response
+        
+        # 2. 删除积分记录并重新计算总积分
+        points_data = self._load_points()
+        history = points_data['history']
+        history_to_keep = []
+        deleted_points = None
+        
+        for record in history:
+            if record['date'] == date:
+                deleted_points = record
+            else:
+                history_to_keep.append(record)
+        
+        if deleted_points:
+            # 重新计算总积分
+            points_data['history'] = history_to_keep
+            
+            # 从头开始重新计算总积分
+            total = 0
+            for i, record in enumerate(history_to_keep):
+                total += record['daily_points']
+                record['total_points'] = total
+            
+            points_data['total_points'] = total
+            
+            # 保存更新后的积分数据
+            with open(self.points_file, 'w', encoding='utf-8') as f:
+                json.dump(points_data, f, ensure_ascii=False, indent=2)
+            
+            result['deleted_points'] = deleted_points
+            result['points_adjusted'] = deleted_points['daily_points']
+        
+        # 3. 设置结果
+        if deleted_response or deleted_points:
+            result['success'] = True
+            if deleted_response and deleted_points:
+                result['message'] = f"成功回档 {date} 的数据！删除了问卷记录和 {deleted_points['daily_points']} 积分。"
+            elif deleted_response:
+                result['message'] = f"成功删除 {date} 的问卷记录，但未找到对应的积分记录。"
+            else:
+                result['message'] = f"成功删除 {date} 的积分记录（{deleted_points['daily_points']}分），但未找到对应的问卷记录。"
+        else:
+            result['message'] = f"未找到 {date} 的任何记录。"
+        
+        return result
+    
+    def get_available_dates_for_rollback(self) -> List[str]:
+        """
+        获取所有可以回档的日期列表
+        """
+        responses = self._load_responses()
+        dates = sorted([r['date'] for r in responses if 'date' in r], reverse=True)
+        return dates

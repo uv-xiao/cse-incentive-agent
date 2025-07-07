@@ -45,6 +45,8 @@ class ScoringSystem:
                 "exceeded": {"name": "超额完成复习", "points": 4}
             },
             "note_taking": {
+                "existing": {"name": "使用已有资料学习", "points": 1},
+                "simple": {"name": "简单记录", "points": 1},
                 "detailed": {"name": "详细笔记", "points": 2},
                 "organized": {"name": "整理归纳笔记", "points": 3}
             },
@@ -213,7 +215,7 @@ class ScoringSystem:
         
         # 笔记积分
         notes_status = responses.get("notes_taken", {}).get("value", "")
-        if notes_status in ["detailed", "organized"]:
+        if notes_status in ["existing", "simple", "detailed", "organized"]:
             notes_points = self.scoring_rules["note_taking"][notes_status]["points"]
             points += notes_points
             point_details.append({
@@ -300,11 +302,30 @@ class ScoringSystem:
         
         # 网课学习积分
         online_course_time = responses.get("online_course_time", {}).get("value", 0)
-        if online_course_time > 0:
+        online_course_display = responses.get("online_course_time", {}).get("display", "")
+        
+        if "已完成所有网课" in online_course_display:
+            # 已完成所有网课，给予适当奖励
+            points += 2
+            point_details.append({
+                "category": "网课学习",
+                "item": "已完成所有网课",
+                "points": 2
+            })
+        elif "复习已看过的内容" in online_course_display:
+            # 复习已学内容，给予适当奖励
+            points += 1
+            point_details.append({
+                "category": "网课学习", 
+                "item": "复习已看过的网课内容",
+                "points": 1
+            })
+        elif online_course_time > 0:
+            # 正常学习新内容
             for threshold, rule in sorted(self.scoring_rules["online_course"].items(), key=lambda x: int(x[0])):
                 if online_course_time >= int(threshold):
                     earned_points = rule["points"]
-            if online_course_time >= 30:
+            if online_course_time >= 15:  # 降低最低时间要求
                 point_details.append({
                     "category": "网课学习",
                     "item": f"网课学习{online_course_time}分钟",
@@ -312,14 +333,15 @@ class ScoringSystem:
                 })
                 points += earned_points
         else:
-            # 未学习网课惩罚
-            penalty = self.scoring_rules["penalties"]["no_online_course"]["points"]
-            points += penalty
-            point_details.append({
-                "category": "惩罚",
-                "item": self.scoring_rules["penalties"]["no_online_course"]["name"],
-                "points": penalty
-            })
+            # 只有选择"没有看网课"才给惩罚
+            if "没有看网课" in online_course_display:
+                penalty = self.scoring_rules["penalties"]["no_online_course"]["points"]
+                points += penalty
+                point_details.append({
+                    "category": "惩罚",
+                    "item": self.scoring_rules["penalties"]["no_online_course"]["name"],
+                    "points": penalty
+                })
         
         # 做题正确率积分/惩罚
         accuracy_rate_str = responses.get("accuracy_rate", "")

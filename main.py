@@ -10,6 +10,7 @@ from modules.data_manager import DataManager
 from modules.report_generator import ReportGenerator
 from modules.excel_handler import ExcelHandler
 from modules.redemption_system import RedemptionSystem
+from modules.questionnaire_optimizer import QuestionnaireOptimizer
 
 
 class StudyDiary:
@@ -20,6 +21,7 @@ class StudyDiary:
         self.report_generator = ReportGenerator(self.data_manager)
         self.excel_handler = ExcelHandler()
         self.redemption_system = RedemptionSystem(self.data_manager)
+        self.questionnaire_optimizer = QuestionnaireOptimizer()
     
     def run(self):
         print("=" * 60)
@@ -51,6 +53,8 @@ class StudyDiary:
                 self.visualize_progress()
             elif choice == '10':
                 self.export_data()
+            elif choice == '11':
+                self.rollback_day()
             elif choice == '0':
                 print("\n👋 再见！继续加油，考公必胜！")
                 break
@@ -72,6 +76,7 @@ class StudyDiary:
         print("8. 📅 生成周总结")
         print("9. 📉 可视化进度")
         print("10. 💾 导出数据")
+        print("11. 🔄 回档（删除某天记录）")
         print("0. 退出系统")
     
     def export_questionnaire_excel(self):
@@ -171,6 +176,9 @@ class StudyDiary:
             answered_path = os.path.join(answered_dir, os.path.basename(filepath))
             shutil.move(filepath, answered_path)
             print(f"\n📁 已将问卷移至: {answered_path}")
+            
+            # 检查是否有用户反馈需要处理
+            self._check_and_handle_user_feedback()
             
         except Exception as e:
             print(f"\n❌ 导入失败: {e}")
@@ -456,6 +464,277 @@ class StudyDiary:
             return
         
         print(f"\n✅ 数据已导出: {export_path}")
+    
+    def rollback_day(self):
+        print("\n" + "=" * 50)
+        print("🔄 回档功能 - 删除某天的记录")
+        print("=" * 50)
+        print("\n⚠️  警告：此操作将永久删除选定日期的所有数据！")
+        print("包括：问卷记录、积分记录、报告等")
+        print("-" * 50)
+        
+        # 获取可回档的日期列表
+        available_dates = self.data_manager.get_available_dates_for_rollback()
+        
+        if not available_dates:
+            print("\n❌ 没有可回档的数据")
+            return
+        
+        print("\n📅 可回档的日期：")
+        for i, date in enumerate(available_dates, 1):
+            # 获取该日期的积分信息
+            points_history = self.data_manager.get_points_history()
+            daily_points = 0
+            for record in points_history:
+                if record['date'] == date:
+                    daily_points = record['daily_points']
+                    break
+            print(f"{i}. {date} (积分: {daily_points:+d})")
+        
+        print(f"\n请输入要回档的日期序号 (1-{len(available_dates)})，或直接输入日期 (YYYY-MM-DD)")
+        print("输入 0 取消操作")
+        
+        choice = input("\n请输入: ").strip()
+        
+        if choice == '0':
+            print("\n✅ 已取消回档操作")
+            return
+        
+        # 解析用户输入
+        target_date = None
+        if choice.isdigit() and 1 <= int(choice) <= len(available_dates):
+            target_date = available_dates[int(choice) - 1]
+        elif len(choice) == 10 and choice[4] == '-' and choice[7] == '-':
+            # 检查是否是有效的日期格式
+            if choice in available_dates:
+                target_date = choice
+            else:
+                print(f"\n❌ 日期 {choice} 没有找到对应的记录")
+                return
+        else:
+            print("\n❌ 无效的输入")
+            return
+        
+        # 再次确认
+        print(f"\n⚠️  确定要删除 {target_date} 的所有记录吗？")
+        print("此操作不可恢复！")
+        confirm = input("输入 'YES' 确认删除: ").strip()
+        
+        if confirm != 'YES':
+            print("\n✅ 已取消回档操作")
+            return
+        
+        # 执行回档
+        print(f"\n⏳ 正在回档 {target_date} 的数据...")
+        result = self.data_manager.rollback_day(target_date)
+        
+        if result['success']:
+            print(f"\n✅ {result['message']}")
+            if result['deleted_response']:
+                print(f"   - 删除了问卷记录")
+            if result['deleted_points']:
+                print(f"   - 删除了积分记录: {result['points_adjusted']:+d}分")
+                print(f"   - 当前总积分: {self.data_manager.get_total_points()}分")
+            
+            # 删除对应的报告文件
+            report_file = f"reports/daily_report_{target_date}.md"
+            if os.path.exists(report_file):
+                os.remove(report_file)
+                print(f"   - 删除了报告文件")
+            
+            pdf_file = f"reports/daily_report_{target_date}.pdf"
+            if os.path.exists(pdf_file):
+                os.remove(pdf_file)
+                print(f"   - 删除了PDF报告")
+        else:
+            print(f"\n❌ {result['message']}")
+    
+    def _check_and_handle_user_feedback(self):
+        """检查并处理用户反馈"""
+        feedback_file = os.path.join("questionnaires", "user_feedback.json")
+        
+        if not os.path.exists(feedback_file):
+            return
+        
+        # 读取反馈
+        with open(feedback_file, 'r', encoding='utf-8') as f:
+            feedback_list = json.load(f)
+        
+        if not feedback_list:
+            return
+        
+        # 获取最新的反馈（今天的）
+        today = datetime.now().strftime("%Y-%m-%d")
+        today_feedback = [fb for fb in feedback_list 
+                         if fb.get('timestamp', '').startswith(today)]
+        
+        if not today_feedback:
+            return
+        
+        print("\n" + "=" * 50)
+        print("📝 检测到用户反馈")
+        print("=" * 50)
+        
+        # 先显示反馈内容
+        print("\n以下是用户的反馈内容：")
+        print("-" * 40)
+        for i, fb in enumerate(today_feedback, 1):
+            print(f"\n{i}. 问题：{fb['question']}")
+            print(f"   原始答案：{fb['original_answer']}")
+            print(f"   {fb['feedback']}")
+        print("-" * 40)
+        
+        # 询问是否要根据反馈修改问卷
+        print("\n是否要让Claude根据这些反馈自动优化问卷问题？")
+        print("输入 'Y' 确认，其他任意键跳过")
+        
+        choice = input("\n请选择: ").strip().upper()
+        
+        if choice == 'Y':
+            print("\n🤖 正在启动AI问卷优化服务...")
+            print("\n⚠️  重要提醒：")
+            print("- 此功能将分析用户反馈并生成问卷修改建议")
+            print("- 会自动备份当前的questionnaire.py文件")
+            print("- 生成的建议需要人工审核后再应用")
+            print("- 修改会影响后续所有问卷的生成")
+            
+            confirm = input("\n确认继续？输入 'CONFIRM' 继续: ").strip()
+            
+            if confirm == 'CONFIRM':
+                print("\n🚀 开始AI优化流程...")
+                print("=" * 50)
+                
+                # 调用问卷优化器
+                result = self.questionnaire_optimizer.optimize_questionnaire(today_feedback)
+                
+                print("\n" + "=" * 50)
+                if result['success']:
+                    print("✅ 问卷优化流程完成！")
+                    print(f"\n📊 处理了 {result['feedback_count']} 条用户反馈")
+                    print(f"📁 备份文件: {result['backup_path']}")
+                    
+                    if result.get('claude_code_ready'):
+                        # Claude Code 准备就绪，可以直接执行修改
+                        print("\n🤖 Claude Code 环境已就绪")
+                        print("=" * 50)
+                        
+                        if result.get('modifications_needed'):
+                            print("\n📋 需要执行的修改：")
+                            for mod in result['modifications_needed']:
+                                print(f"- {mod['question']}: {mod['suggestion']}")
+                        
+                        print("\n✨ Claude Code 现在会自动完成以下修改：")
+                        print("1. 修改 questionnaire.py 添加新选项")
+                        print("2. 更新 scoring.py 调整积分规则")
+                        print("3. 更新文档说明变更内容")
+                        
+                        # 保存修改日志
+                        if result.get('modification_log'):
+                            log_file = os.path.join(self.questionnaire_optimizer.suggestions_dir, 
+                                                  f"modification_log_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt")
+                            with open(log_file, 'w', encoding='utf-8') as f:
+                                f.write(result['modification_log'])
+                            print(f"\n📄 修改计划已保存: {log_file}")
+                        
+                        print("\n🔧 Claude Code 将基于用户反馈优化问卷系统...")
+                        print("\n（注：实际修改将由 Claude Code 执行）")
+                    
+                    elif result.get('claude_output'):
+                        # Claude Code 成功执行
+                        print("\n🎉 Claude Code 已自动完成代码修改！")
+                        if result.get('modified_files'):
+                            print(f"🔧 修改的文件: {', '.join(result['modified_files'])}")
+                        
+                        # 保存修改日志
+                        if result.get('modification_log'):
+                            log_file = os.path.join(self.questionnaire_optimizer.suggestions_dir, 
+                                                  f"modification_log_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt")
+                            with open(log_file, 'w', encoding='utf-8') as f:
+                                f.write(result['modification_log'])
+                            print(f"📄 修改日志: {log_file}")
+                        
+                        print("\n📋 下一步操作：")
+                        print("1. 测试修改后的问卷功能（导出Excel验证选项）")
+                        print("2. 查看修改日志了解具体更改")
+                        print("3. 如果修改不理想，从备份恢复")
+                        print("4. 验证积分计算是否正常")
+                    
+                    elif result.get('requires_manual_action'):
+                        # Claude Code 不可用或失败，生成了建议
+                        print("\n⚠️ Claude Code 未能自动修改，已生成修改建议")
+                        
+                        if result.get('error'):
+                            print(f"原因: {result['error']}")
+                        
+                        if result.get('modifications_needed'):
+                            print("\n📋 识别到的修改需求：")
+                            for mod in result['modifications_needed']:
+                                print(f"- {mod['question']}: {mod['suggestion']}")
+                        
+                        # 保存建议文件
+                        if result.get('modification_log'):
+                            suggestions_file = os.path.join(self.questionnaire_optimizer.suggestions_dir, 
+                                                          "modification_suggestions.txt")
+                            with open(suggestions_file, 'w', encoding='utf-8') as f:
+                                f.write(result['modification_log'])
+                            print(f"\n📄 修改建议已保存: {suggestions_file}")
+                        
+                        print("\n💡 请手动修改或安装 Claude Code 后重试")
+                        print("手动修改步骤：")
+                        print("1. 查看修改建议文件")
+                        print("2. 根据建议修改 questionnaire.py 和 scoring.py")
+                        print("3. 测试修改后的功能")
+                    
+                    elif result.get('requires_claude_code'):
+                        # 旧的逻辑，保留兼容性
+                        print("\n🤖 检测到需要代码修改")
+                        print("=" * 50)
+                        
+                        if result.get('modifications_needed'):
+                            print("\n📋 识别到的修改需求：")
+                            for mod in result['modifications_needed']:
+                                print(f"- {mod['question']}: {mod['suggestion']}")
+                        
+                        print("\n💡 Claude Code 可以帮你自动修改代码！")
+                        print("请对 Claude Code 说：")
+                        print("\n   '请根据用户反馈修改问卷选项'")
+                        
+                        if result.get('modification_log'):
+                            log_file = os.path.join(self.questionnaire_optimizer.suggestions_dir, 
+                                                  f"modification_log_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt")
+                            with open(log_file, 'w', encoding='utf-8') as f:
+                                f.write(result['modification_log'])
+                            print(f"\n📄 详细分析已保存: {log_file}")
+                    
+                    elif 'log_file' in result:
+                        # 兼容旧的返回格式
+                        print(f"📄 修改日志: {result['log_file']}")
+                        if result.get('modified_files'):
+                            print(f"🔧 修改的文件: {', '.join(result['modified_files'])}")
+                        
+                        print("\n🎉 问卷优化已完成！")
+                        print("\n📋 下一步操作：")
+                        print("1. 测试修改后的问卷功能")
+                        print("2. 查看修改日志")
+                        print("3. 验证积分计算")
+                    
+                    else:
+                        # 建议模式
+                        if 'suggestions_file' in result:
+                            print(f"📄 建议文件: {result['suggestions_file']}")
+                        print("\n📋 下一步操作：")
+                        print("1. 查看生成的建议文件")
+                        print("2. 根据建议修改代码")
+                        print("3. 测试修改后的功能")
+                    
+                    print(f"\n💡 {result['message']}")
+                else:
+                    print("❌ 优化过程中出现错误")
+                    print(f"错误信息: {result['message']}")
+                    if 'error' in result:
+                        print(f"详细错误: {result['error']}")
+            else:
+                print("\n✅ 已取消问卷优化")
 
 
 def main():
