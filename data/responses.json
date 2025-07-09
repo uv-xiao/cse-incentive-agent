@@ -115,5 +115,131 @@
     "special_achievement": "论文写完了一个部分！开始新的章节 做题题量上来了，但是速度有点慢",
     "tomorrow_plan": "和今天差不多～复习成语，背一下申论材料，做数量题，继续写论文！",
     "timestamp": "2025-07-08T02:21:31.738585"
+  },
+  {
+    "date": "2025-07-08",
+    "study_completed": {
+      "display": "📝 部分完成",
+      "value": "partial"
+    },
+    "study_duration": {
+      "display": "👑 480分钟以上",
+      "value": 540
+    },
+    "problems_completed": {
+      "display": "📝 31-50题",
+      "value": 40
+    },
+    "focus_level": {
+      "display": "😐 5-6分（一般）",
+      "value": 5.5
+    },
+    "emotional_state": {
+      "display": "😐 平静正常",
+      "value": "normal"
+    },
+    "physical_condition": {
+      "display": "😐 状态一般",
+      "value": "normal"
+    },
+    "sleep_quality": {
+      "display": "😊 良好（7-8小时）",
+      "value": "good"
+    },
+    "diet_quality": {
+      "display": "🍜 基本正常",
+      "value": "normal"
+    },
+    "breaks_taken": {
+      "display": "🧘 劳逸结合很好",
+      "value": "excellent"
+    },
+    "review_completed": {
+      "display": "🌟 超额完成复习",
+      "value": "exceeded"
+    },
+    "notes_taken": {
+      "display": "❌ 没有做笔记/看资料",
+      "value": "none"
+    },
+    "thesis_writing": {
+      "display": "🔥 2001-3000字",
+      "value": 2500
+    },
+    "memorization_time": {
+      "display": "🔥 60-90分钟",
+      "value": 75
+    },
+    "online_course_time": {
+      "display": "❌ 没有看网课",
+      "value": 0
+    },
+    "accuracy_rate": "87",
+    "special_achievement": "写论文找资料找了很久很久 唉 ，感觉很疲惫",
+    "tomorrow_plan": "还是早上复习、背成语、做数量题（把排列组合做完吧），下午继续写论文，希望能多写一些",
+    "timestamp": "2025-07-08T23:58:33.074466"
+  },
+  {
+    "date": "2025-07-09",
+    "study_completed": {
+      "display": "📝 部分完成",
+      "value": "partial"
+    },
+    "study_duration": {
+      "display": "👑 480分钟以上",
+      "value": 540
+    },
+    "problems_completed": {
+      "display": "📝 31-50题",
+      "value": 40
+    },
+    "focus_level": {
+      "display": "😊 7-8分（良好）",
+      "value": 7.5
+    },
+    "emotional_state": {
+      "display": "😐 平静正常",
+      "value": "normal"
+    },
+    "physical_condition": {
+      "display": "😐 状态一般",
+      "value": "normal"
+    },
+    "sleep_quality": {
+      "display": "😊 良好（7-8小时）",
+      "value": "good"
+    },
+    "diet_quality": {
+      "display": "🥗 健康均衡",
+      "value": "healthy"
+    },
+    "breaks_taken": {
+      "display": "🧘 劳逸结合很好",
+      "value": "excellent"
+    },
+    "review_completed": {
+      "display": "✅ 完成复习计划",
+      "value": "completed"
+    },
+    "notes_taken": {
+      "display": "📚 使用已有资料学习",
+      "value": "existing"
+    },
+    "thesis_writing": {
+      "display": "📝 1001-2000字",
+      "value": 1500
+    },
+    "memorization_time": {
+      "display": "🔥 60-90分钟",
+      "value": 75
+    },
+    "online_course_time": {
+      "display": "❌ 没有看网课",
+      "value": 0
+    },
+    "accuracy_rate": "92.6",
+    "special_achievement": "今天的数学题特别难 做到头疼 花了很多时间 决定学会放弃",
+    "tomorrow_plan": "要花更多时间在论文上",
+    "timestamp": "2025-07-10T00:57:23.831369"
   }
 ]

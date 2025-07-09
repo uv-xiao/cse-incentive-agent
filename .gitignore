@@ -4,3 +4,7 @@
 *.egg-info
 .mypy*
 .pixi
+__pycache__
+questionnaires/
+reports/
+backups/
